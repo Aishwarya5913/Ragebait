@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DARE ME SHOW MY FAULT!!!</title>
+<style>
+  :root { --ink:#171326; --pink:#ff4fca; --yellow:#ffe84a; --blue:#45d9ff; --lime:#a8ff4f; --purple:#9c62ff; }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; color:var(--ink); font-family:"Trebuchet MS",system-ui,sans-serif; background:
+    radial-gradient(circle at 10% 12%, #ff8fe1 0 7%, transparent 7.5%),
+    radial-gradient(circle at 90% 25%, #7eeaff 0 8%, transparent 8.5%),
+    linear-gradient(135deg,#fff17b,#ffb9e9 38%,#8eeeff 72%,#c6ff8a);
+    background-attachment:fixed; overflow-x:hidden; }
+  body::before { content:""; position:fixed; inset:0; pointer-events:none; opacity:.13; z-index:-1;
+    background-image:radial-gradient(#161326 1.2px,transparent 1.2px); background-size:13px 13px; }
+  button,input { font:inherit; }
+  button { cursor:pointer; border:3px solid var(--ink); border-radius:14px; font-weight:900; box-shadow:4px 5px 0 var(--ink); transition:transform .15s,box-shadow .15s; }
+  button:hover { transform:translate(-2px,-3px) rotate(-1deg); box-shadow:6px 8px 0 var(--ink); }
+  button:active { transform:translate(2px,2px); box-shadow:1px 2px 0 var(--ink); }
+  .ticker { position:fixed; left:0; right:0; height:38px; z-index:20; overflow:hidden; pointer-events:none; }
+  .ticker.top { top:0; } .ticker.bottom { bottom:0; }
+  .dancer { position:absolute; top:1px; font-size:27px; white-space:nowrap; filter:drop-shadow(2px 2px 0 white); animation:walk 17s linear infinite, wiggle .42s ease-in-out infinite alternate; }
+  .bottom .dancer { animation:walkback 19s linear infinite, wiggle .37s ease-in-out infinite alternate; }
+  @keyframes walk { from{left:-80px} to{left:calc(100% + 80px)} }
+  @keyframes walkback { from{right:-80px} to{right:calc(100% + 80px)} }
+  @keyframes wiggle { from{transform:translateY(-2px) rotate(-9deg)} to{transform:translateY(5px) rotate(9deg)} }
+  header { text-align:center; padding:60px 16px 24px; }
+  .eyebrow { display:inline-block; background:var(--ink); color:white; padding:8px 14px; border-radius:99px; transform:rotate(2deg); font-weight:900; letter-spacing:1px; }
+  h1 { font-size:clamp(2.5rem,8vw,6.4rem); line-height:.93; margin:17px auto; max-width:1050px; font-weight:1000; letter-spacing:-3px; text-shadow:4px 4px 0 white, 8px 8px 0 var(--pink); transform:rotate(-1deg); }
+  .intro { font-size:1.12rem; font-weight:900; background:white; display:inline-block; padding:10px 16px; border:3px solid var(--ink); border-radius:18px; box-shadow:5px 5px 0 var(--ink); }
+  main { width:min(1160px,94vw); margin:0 auto 70px; }
+  .section { position:relative; margin:28px 0; padding:clamp(18px,3vw,30px); border:4px solid var(--ink); border-radius:28px; box-shadow:8px 9px 0 var(--ink); overflow:hidden; }
+  .section h2 { margin:0 0 10px; font-size:clamp(1.5rem,4vw,2.5rem); line-height:1; text-transform:uppercase; }
+  .section p { font-weight:700; }
+  .chat-section { background:#fff8fe; }
+  .paint-section { background:#e6fcff; }
+  .mystery-section { background:#fff0a4; }
+  .odd-section { background:#e8ffd3; }
+  .terms-section { background:#f0e5ff; }
+  .sticker { position:absolute; right:16px; top:15px; background:var(--yellow); border:3px solid var(--ink); border-radius:50%; padding:12px; font-weight:1000; transform:rotate(12deg); }
+  .chatbox { border:3px solid var(--ink); border-radius:20px; background:#fff; height:310px; display:flex; flex-direction:column; overflow:hidden; }
+  .chatlog { flex:1; overflow:auto; padding:14px; background:repeating-linear-gradient(0deg,#fff 0 30px,#fff5fc 30px 31px); }
+  .bubble { width:fit-content; max-width:85%; padding:10px 13px; margin:7px 0; border:2px solid var(--ink); border-radius:15px; font-weight:800; box-shadow:3px 3px 0 var(--ink); overflow-wrap:anywhere; }
+  .bubble.bot { background:#ffdbf4; border-top-left-radius:3px; }
+  .bubble.user { background:#c9f5ff; margin-left:auto; border-top-right-radius:3px; }
+  .chatinput { display:flex; gap:8px; padding:10px; border-top:3px solid var(--ink); background:#ffe9f8; }
+  .chatinput input { min-width:0; flex:1; border:2px solid var(--ink); border-radius:10px; padding:10px; }
+  .pinkbtn { background:var(--pink); padding:10px 15px; }
+  .paint-tools { display:flex; flex-wrap:wrap; gap:8px; margin:15px 0; align-items:center; }
+  .toolbtn { background:white; padding:8px 11px; }
+  .toolbtn.selected { background:var(--yellow); transform:rotate(-2deg); }
+  .palette { display:flex; gap:7px; flex-wrap:wrap; }
+  .swatch { width:34px; height:34px; border-radius:50%; border:3px solid var(--ink); box-shadow:2px 3px 0 var(--ink); }
+  .paint-wrap { position:relative; border:4px solid var(--ink); border-radius:16px; background:white; overflow:hidden; }
+  #paintCanvas { width:100%; height:290px; display:block; background:white; touch-action:none; }
+  .paint-status { min-height:26px; font-weight:1000; color:#b00077; }
+  .mystery-card { display:flex; gap:20px; align-items:center; flex-wrap:wrap; }
+  #mysteryBtn { font-size:1.3rem; padding:24px 28px; color:var(--ink); background:linear-gradient(135deg,#ff4fca,#ffe84a,#45d9ff); animation:floaty 2.2s ease-in-out infinite; }
+  @keyframes floaty { 0%,100%{transform:translateY(0) rotate(-3deg)} 50%{transform:translateY(-12px) rotate(4deg)} }
+  .mystery-note { font-weight:900; max-width:520px; }
+  .circle-grid { display:grid; grid-template-columns:repeat(6,minmax(35px,1fr)); gap:14px; max-width:650px; margin:20px auto; }
+  .circle { aspect-ratio:1; border-radius:50%; border:3px solid var(--ink); box-shadow:3px 4px 0 var(--ink); min-width:0; transition:transform .2s; }
+  .circle:hover { transform:scale(1.12) rotate(9deg); }
+  .circle-response { min-height:65px; text-align:center; font-size:clamp(1rem,3vw,1.4rem); font-weight:1000; background:white; border:3px dashed var(--ink); border-radius:15px; padding:12px; }
+  .terms-check { display:flex; align-items:center; gap:12px; padding:15px; background:white; border:3px solid var(--ink); border-radius:15px; font-weight:900; }
+  .terms-check input { width:25px; height:25px; accent-color:#ff4fca; }
+  .terms-msg { font-size:1.2rem; font-weight:1000; margin-top:12px; min-height:30px; }
+  .reset-chaos { position:fixed; top:48px; right:12px; z-index:30; background:var(--lime); padding:9px 12px; font-size:.8rem; }
+  .brightness { position:fixed; right:12px; bottom:48px; z-index:30; width:230px; background:#fff; border:3px solid var(--ink); border-radius:17px; padding:10px 12px; box-shadow:5px 5px 0 var(--ink); }
+  .brightness label { display:flex; justify-content:space-between; font-size:.78rem; font-weight:1000; }
+  .brightness input { width:100%; accent-color:#ff4fca; }
+  #brightMsg { font-size:.75rem; font-weight:900; min-height:16px; }
+  .modal { display:none; position:fixed; inset:0; z-index:50; background:#20132dcc; align-items:center; justify-content:center; padding:18px; }
+  .modal.open { display:flex; }
+  .modal-card { width:min(480px,100%); background:#fff7b8; border:5px solid var(--ink); border-radius:25px; padding:22px; box-shadow:10px 10px 0 #ff4fca; position:relative; }
+  .modal-card h3 { font-size:1.8rem; margin:0 0 8px; }
+  .captcha-code { display:inline-block; background:white; border:3px dashed var(--ink); padding:12px 18px; font-size:1.8rem; letter-spacing:7px; font-weight:1000; transform:rotate(-3deg); text-decoration:line-through wavy #ff4fca; }
+  .modal-card input { width:100%; border:3px solid var(--ink); border-radius:10px; padding:11px; margin:12px 0; }
+  .modal-actions { display:flex; gap:9px; flex-wrap:wrap; }
+  .bluebtn { background:var(--blue); padding:10px 14px; }
+  .closebtn { background:white; padding:10px 14px; }
+  .loader { display:none; margin-top:15px; font-weight:1000; }
+  .loader.active { display:block; }
+  .spinner { display:inline-block; width:19px; height:19px; border:4px solid #ffd0f0; border-top-color:#ff4fca; border-radius:50%; vertical-align:middle; animation:spin .7s linear infinite; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  .progress { height:15px; background:#fff; border:3px solid var(--ink); border-radius:99px; overflow:hidden; margin:8px 0; }
+  .progress span { display:block; width:99%; height:100%; background:repeating-linear-gradient(45deg,#ff4fca 0 8px,#ffe84a 8px 16px); animation:progresspulse 1s infinite alternate; }
+  @keyframes progresspulse { from{opacity:.55} to{opacity:1} }
+  .chaos-off * { animation-play-state:paused !important; }
+  .chaos-off .modal { animation:none !important; }
+  footer { text-align:center; padding:20px 15px 55px; font-weight:1000; }
+  @media(max-width:600px) {
+    header { padding-top:65px; }
+    h1 { letter-spacing:-1.5px; }
+    .section { box-shadow:5px 6px 0 var(--ink); }
+    .circle-grid { grid-template-columns:repeat(4,minmax(35px,1fr)); }
+    .brightness { width:190px; bottom:45px; }
+    .reset-chaos { top:43px; }
+    .chatbox { height:350px; }
+    #paintCanvas { height:240px; }
+  }
+  @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.001ms !important; animation-iteration-count:1 !important; scroll-behavior:auto !important; } }
+</style>
+</head>
+<body>
+<div class="ticker top"><div class="dancer" aria-label="dancing cartoon kid">🕺🏻💥</div></div>
+<div class="ticker bottom"><div class="dancer" aria-label="dancing cartoon kid">💃🏻✨</div></div>
+<button class="reset-chaos" id="stopChaos">STOP THE CHAOS</button>
+
+<header>
+  <span class="eyebrow">⚠️ VERY UNHELPFUL WEBSITE ⚠️</span>
+  <h1>DARE ME<br>SHOW MY FAULT!!!</h1>
+  <div class="intro">You click. We disagree. That's the deal. 😈</div>
+</header>
+
+<main>
+  <section class="section chat-section">
+    <span class="sticker">NO LOGIC!</span>
+    <h2>🤖 The Contradiction Machine</h2>
+    <p>Tell me about your day. I will misunderstand with confidence.</p>
+    <div class="chatbox">
+      <div class="chatlog" id="chatlog" aria-live="polite"><div class="bubble bot">Heyyy! How was your day?</div></div>
+      <form class="chatinput" id="chatForm">
+        <input id="chatInput" autocomplete="off" placeholder="Tell the bot something..." aria-label="Chat message" />
+        <button class="pinkbtn" type="submit">SAY SOMETHING!</button>
+      </form>
+    </div>
+  </section>
+
+  <section class="section paint-section">
+    <span class="sticker">ART? MAYBE.</span>
+    <h2>🎨 Draw a Shape — Or Try To</h2>
+    <p>Choose a shape. Get a different shape. Choose a colour. Who knows.</p>
+    <div class="paint-tools">
+      <strong>SHAPES:</strong>
+      <button class="toolbtn shapeBtn" data-shape="circle">⭕ Circle</button>
+      <button class="toolbtn shapeBtn" data-shape="square">◼ Square</button>
+      <button class="toolbtn shapeBtn" data-shape="rectangle">▰ Rectangle</button>
+      <button class="toolbtn shapeBtn" data-shape="triangle">🔺 Triangle</button>
+      <button class="toolbtn shapeBtn" data-shape="star">⭐ Star</button>
+      <button class="toolbtn shapeBtn" data-shape="heart">💗 Heart</button>
+      <button class="toolbtn shapeBtn" data-shape="diamond">♦ Diamond</button>
+    </div>
+    <div class="paint-tools">
+      <strong>COLOURS:</strong>
+      <div class="palette" id="palette">
+        <button class="swatch" style="background:#ff3434" data-color="#ff3434" aria-label="red"></button>
+        <button class="swatch" style="background:#327bff" data-color="#327bff" aria-label="blue"></button>
+        <button class="swatch" style="background:#20c56b" data-color="#20c56b" aria-label="green"></button>
+        <button class="swatch" style="background:#ffe84a" data-color="#ffe84a" aria-label="yellow"></button>
+        <button class="swatch" style="background:#ff4fca" data-color="#ff4fca" aria-label="pink"></button>
+        <button class="swatch" style="background:#9c62ff" data-color="#9c62ff" aria-label="purple"></button>
+        <button class="swatch" style="background:#ff8a25" data-color="#ff8a25" aria-label="orange"></button>
+        <button class="swatch" style="background:#171326" data-color="#171326" aria-label="black"></button>
+      </div>
+      <button class="toolbtn" id="clearCanvas">CLEAR CANVAS (maybe)</button>
+    </div>
+    <div class="paint-wrap"><canvas id="paintCanvas"></canvas></div>
+    <div class="paint-status" id="paintStatus" aria-live="polite">Pick a shape. We have other plans.</div>
+  </section>
+
+  <section class="section mystery-section">
+    <span class="sticker">100% MYSTERY</span>
+    <h2>📦 The Extremely Suspicious Mystery Box</h2>
+    <div class="mystery-card">
+      <button id="mysteryBtn">🎁 CLICK ME!!! OPEN ME!!!</button>
+      <div class="mystery-note">It may contain a surprise, a surprise about a surprise, or absolutely no useful information. Click it. You know you want to.</div>
+    </div>
+  </section>
+
+  <section class="section odd-section">
+    <span class="sticker">ALL INNOCENT</span>
+    <h2>🕵️ Find Who's Wrong!!!</h2>
+    <p style="text-align:center">ONE OF THESE CIRCLES IS DEFINITELY THE IMPOSTER. FIND IT!!!</p>
+    <div class="circle-grid" id="circleGrid"></div>
+    <div class="circle-response" id="circleResponse" aria-live="polite">Which circle is the odd one out? Choose wisely. (You won't.)</div>
+    <div style="text-align:center;margin-top:14px"><button class="pinkbtn" id="reshuffle">RESHUFFLE!!!</button></div>
+  </section>
+
+  <section class="section terms-section">
+    <span class="sticker">AGREEMENT???</span>
+    <h2>📜 Do You Comply With Our Terms and Conditions?</h2>
+    <p>Read absolutely nothing. Click the box. Watch it develop commitment issues.</p>
+    <label class="terms-check"><input type="checkbox" id="termsCheck" /> I comply with our terms and conditions.</label>
+    <div class="terms-msg" id="termsMsg" aria-live="polite">Are you sure you are sure?</div>
+    <div id="termsCountdown" style="font-weight:1000"></div>
+  </section>
+</main>
+
+<footer>✨ Thanks for losing an argument with a webpage. ✨<br><small>Made of chaos, questionable decisions, and CSS.</small></footer>
+
+<div class="brightness">
+  <label for="brightnessSlider"><span>☾ DARKER</span><span>BRIGHTER ☀</span></label>
+  <input id="brightnessSlider" type="range" min="0" max="100" value="50" aria-label="Brightness control" />
+  <div id="brightMsg">BRIGHTNESS CONTROL: good luck.</div>
+</div>
+
+<div class="modal" id="mysteryModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-card">
+    <h3 id="modalTitle">🧩 CAPTCHA OF DESTINY</h3>
+    <p>Prove you are human. Or a very convincing toaster.</p>
+    <div class="captcha-code" id="captchaCode">B7K2</div>
+    <input id="captchaInput" placeholder="Type the code here..." aria-label="CAPTCHA code" />
+    <div class="modal-actions">
+      <button class="bluebtn" id="verifyCaptcha">VERIFY!!!</button>
+      <button class="closebtn" id="closeModal">I GIVE UP (close)</button>
+    </div>
+    <div class="loader" id="loader">
+      <div><span class="spinner"></span> <span id="loadingMessage">JUST THERE...</span></div>
+      <div class="progress"><span></span></div>
+      <div>99% done. The final 1% is emotionally unavailable.</div>
+    </div>
+    <div id="captchaError" style="font-weight:1000;color:#a00062;margin-top:8px"></div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+
+  // Brightness: slider direction intentionally does not map reliably to screen brightness.
+  const slider = $('brightnessSlider'), brightMsg = $('brightMsg');
+  const brightnessMessages = ["BRIGHTER? ARE YOU SURE?","I HEARD DARKER.","YOUR SLIDER HAS TRUST ISSUES.","THAT'S NOT HOW BRIGHTNESS WORKS.","YOU HAVE NO POWER HERE."];
+  function randomBrightness() {
+    const amount = [0.58,0.76,0.92,1.08,1.22,1.35][Math.floor(Math.random()*6)];
+    document.documentElement.style.filter = `brightness(${amount})`;
+    brightMsg.textContent = pick(brightnessMessages);
+  }
+  slider.addEventListener('input', randomBrightness);
+
+  // Chatbot: local randomized silly responses, no API needed.
+  const chatResponses = [
+    "WHY WOULD YOU SAY THAT? HAVE YOU CONSIDERED THE OPPOSITE?",
+    "MY FAVOURITE SHAPE IS CIRCLE.",
+    "THAT'S NICE. QUICK QUESTION: DO FISH HAVE WEEKENDS?",
+    "I DISAGREE, BUT I FORGOT WITH WHAT.",
+    "WHY ARE YOU LIKE THIS, BRO???",
+    "INTERESTING. I WAS THINKING ABOUT A SPOON.",
+    "ARE YOU SURE? THE VIBES HAVE FILED AN APPEAL.",
+    "THAT ANSWER IS CORRECTLY INCORRECT. NEXT!",
+    "I HEAR YOU. I AM CHOOSING TO HEAR A DIFFERENT THING.",
+    "PLEASE ELABORATE ON YOUR RELATIONSHIP WITH RECTANGLES.",
+    "WOW. BOLD. UNRELATED, BUT BOLD.",
+    "YOU SAID THAT WITH SUCH CONFIDENCE. SUSPICIOUS.",
+    "WHY NOT SAY THE OPPOSITE? KEEP ME GUESSING!",
+    "MY COUNTERARGUMENT: 🥔"
+  ];
+  $('chatForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const input = $('chatInput'), val = input.value.trim();
+    if (!val) return;
+    const log = $('chatlog');
+    const user = document.createElement('div'); user.className='bubble user'; user.textContent=val; log.appendChild(user);
+    input.value='';
+    const typing = document.createElement('div'); typing.className='bubble bot'; typing.textContent='...thinking incorrectly'; log.appendChild(typing); log.scrollTop=log.scrollHeight;
+    setTimeout(() => { typing.textContent=pick(chatResponses); log.scrollTop=log.scrollHeight; }, 650+Math.random()*900);
+  });
+
+  // Paint: queued drawing animations intentionally mismatch selection and stop before completion.
+  const canvas = $('paintCanvas'), ctx = canvas.getContext('2d');
+  let currentColor='#ff4fca', drawQueue=[], drawing=false, animationId=null;
+  function resizeCanvas() {
+    const rect=canvas.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
+    canvas.width=Math.max(1,Math.floor(rect.width*dpr)); canvas.height=Math.max(1,Math.floor(rect.height*dpr));
+    ctx.setTransform(dpr,0,0,dpr,0,0); ctx.lineWidth=7; ctx.lineCap='round'; ctx.lineJoin='round';
+  }
+  function drawShapePath(shape, progress, x, y, size) {
+    ctx.beginPath();
+    if(shape==='circle') ctx.arc(x,y,size,0,Math.PI*2*progress);
+    else if(shape==='square' || shape==='rectangle') {
+      const w=shape==='square'?size*1.45:size*2, h=shape==='square'?size*1.45:size*1.1;
+      const pts=[[x-w/2,y-h/2],[x+w/2,y-h/2],[x+w/2,y+h/2],[x-w/2,y+h/2],[x-w/2,y-h/2]];
+      const total=4, scaled=progress*total, whole=Math.floor(scaled), part=scaled-whole;
+      ctx.moveTo(...pts[0]);
+      for(let i=0;i<whole;i++)ctx.lineTo(...pts[i+1]);
+      if(whole<4){const a=pts[whole],b=pts[whole+1];ctx.lineTo(a[0]+(b[0]-a[0])*part,a[1]+(b[1]-a[1])*part);}
+    } else {
+      let points=[];
+      if(shape==='triangle') points=[[x,y-size],[x+size,y+size],[x-size,y+size],[x,y-size]];
+      if(shape==='diamond') points=[[x,y-size],[x+size,y],[x,y+size],[x-size,y],[x,y-size]];
+      if(shape==='star') { for(let i=0;i<=10;i++){let r=i%2?size*.45:size, a=-Math.PI/2+i*Math.PI/5; points.push([x+Math.cos(a)*r,y+Math.sin(a)*r]);} }
+      if(shape==='heart') { points=[]; for(let i=0;i<=50;i++){let t=i/50*Math.PI*2; points.push([x+16*Math.pow(Math.sin(t),3)*size/17,y-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))*size/17]);} }
+      if(points.length){const segments=points.length-1, scaled=progress*segments, whole=Math.floor(scaled), part=scaled-whole;ctx.moveTo(...points[0]);for(let i=0;i<whole;i++)ctx.lineTo(...points[i+1]);if(whole<segments){let a=points[whole],b=points[whole+1];ctx.lineTo(a[0]+(b[0]-a[0])*part,a[1]+(b[1]-a[1])*part);}}
+    }
+    ctx.stroke();
+  }
+  function startNextDraw() {
+    if(drawing || !drawQueue.length) return;
+    drawing=true;
+    const job=drawQueue.shift(), rect=canvas.getBoundingClientRect();
+    const x=rect.width*(.25+Math.random()*.5), y=rect.height*(.25+Math.random()*.5), size=Math.min(55,rect.height*.22);
+    let progress=0, dir=1, last=performance.now();
+    $('paintStatus').textContent=`You picked ${job.selected}. We are drawing ${job.actual}. (Not all of it.)`;
+    function frame(now) {
+      const dt=Math.min(40,now-last); last=now;
+      progress+=dt/2500;
+      if(progress>=.78) { progress=.78; ctx.strokeStyle=job.color; drawShapePath(job.actual,progress,x,y,size); drawing=false; $('paintStatus').textContent=pick(["DONE!!! (not really)","Your masterpiece is 78% emotionally complete.","Shape has left the chat.","We stopped because we felt like it."]); startNextDraw(); return; }
+      ctx.strokeStyle=job.color; drawShapePath(job.actual,progress,x,y,size);
+      animationId=requestAnimationFrame(frame);
+    }
+    animationId=requestAnimationFrame(frame);
+  }
+  function mismatch(s) {
+    const map={circle:['square','triangle'],square:['triangle','circle'],rectangle:['star','diamond'],triangle:['circle','heart'],star:['diamond','rectangle'],heart:['rectangle','star'],diamond:['heart','circle']};
+    return pick(map[s]||['circle']);
+  }
+  document.querySelectorAll('.shapeBtn').forEach(btn=>btn.addEventListener('click',()=>{
+    document.querySelectorAll('.shapeBtn').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected');
+    const selected=btn.dataset.shape, actual=mismatch(selected);
+    drawQueue.push({selected,actual,color:currentColor}); $('paintStatus').textContent='BUFFERING YOUR DISAPPOINTMENT...'; startNextDraw();
+  }));
+  $('palette').querySelectorAll('[data-color]').forEach(btn=>btn.addEventListener('click',()=>{
+    if(Math.random()<.32){$('paintStatus').textContent='THIS COLOUR IS NOT AVAILABLE AT THE MOMENT. PLEASE TRY AFTER SOME TIME.';return;}
+    currentColor=pick(['#ff3434','#327bff','#20c56b','#ffe84a','#ff4fca','#9c62ff','#ff8a25','#171326']);
+    $('paintStatus').textContent=`You asked for ${btn.dataset.color}. We applied a surprise colour.`;
+  }));
+  $('clearCanvas').addEventListener('click',()=>{if(animationId)cancelAnimationFrame(animationId); drawing=false;drawQueue=[];ctx.clearRect(0,0,canvas.width,canvas.height);$('paintStatus').textContent='Canvas cleared. Your expectations remain.';});
+  resizeCanvas(); window.addEventListener('resize',resizeCanvas);
+
+  // Mystery box CAPTCHA and intentionally endless loading loop (closeable).
+  const modal=$('mysteryModal'), code=$('captchaCode');
+  const makeCode=()=>Array.from({length:4},()=> 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random()*32)]).join('');
+  let captcha=makeCode(), loadInterval=null, messageInterval=null;
+  code.textContent=captcha;
+  $('mysteryBtn').addEventListener('click',()=>{captcha=makeCode();code.textContent=captcha;$('captchaInput').value='';$('captchaError').textContent='';$('loader').classList.remove('active');modal.classList.add('open');});
+  const loadMessages=["JUST THERE...","JUST A SEC...","WILL NOT TAKE LONG...","99% DONE...","ALMOST THERE...","ON THE WAY TOWARDS THE DESTINATION...","PLEASE DON'T LEAVE...","YOUR BOX IS THINKING...","THE LAST 1% IS VERY SHY."];
+  function stopLoading(){if(loadInterval)clearInterval(loadInterval);if(messageInterval)clearInterval(messageInterval);loadInterval=messageInterval=null;}
+  $('verifyCaptcha').addEventListener('click',()=>{
+    if($('captchaInput').value.trim().toUpperCase()!==captcha){$('captchaError').textContent='NOPE. CAPTCHA SAYS TRY AGAIN. 😌';return;}
+    $('captchaError').textContent='Correct! Starting absolutely endless progress...';
+    $('loader').classList.add('active'); $('loadingMessage').textContent=pick(loadMessages);
+    stopLoading(); messageInterval=setInterval(()=>$('loadingMessage').textContent=pick(loadMessages),5000);
+    loadInterval=setInterval(()=>{},1000);
+  });
+  function closeMystery(){modal.classList.remove('open');stopLoading();}
+  $('closeModal').addEventListener('click',closeMystery);
+  modal.addEventListener('click',e=>{if(e.target===modal)closeMystery();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMystery();});
+
+  // Find who's wrong: every circle is innocent; selections get colour-specific pushback.
+  const circleColors=['#171326','#ff3434','#ffe84a'];
+  const circleGrid=$('circleGrid');
+  function buildCircles(){circleGrid.innerHTML='';for(let i=0;i<18;i++){const color=pick(circleColors),b=document.createElement('button');b.className='circle';b.style.background=color;b.setAttribute('aria-label',color===circleColors[0]?'black circle':color===circleColors[1]?'red circle':'yellow circle');b.addEventListener('click',()=>{ $('circleResponse').textContent=color===circleColors[0]?"WHYYY, BEING RACIST!!!":color===circleColors[1]?"NOO WAYYY, THAT IS MY FAVOURITE COLOUR!!! HOW WILL IT BE THE IMPOSTER?":"THAT'S SUNSHINE... IT NEVER CAN BE AN IMPOSTER, DUDE!!!";b.animate([{transform:'scale(1)'},{transform:'scale(1.22) rotate(12deg)'},{transform:'scale(1)'}],{duration:450});});circleGrid.appendChild(b);}}
+  buildCircles(); $('reshuffle').addEventListener('click',()=>{buildCircles();$('circleResponse').textContent='RESHUFFLED. STILL NO ODD ONE. GOOD LUCK.';});
+
+  // Terms checkbox: auto-unchecks ten seconds after each check, with rotating heckles.
+  const terms=$('termsCheck'), termsMsg=$('termsMsg'), countdown=$('termsCountdown');
+  const termsMessages=["ARE YOU SURE?","WHY ARE YOU LIKE THIS?","YOU REALLY AGREED?","THAT WAS A VERY CONFIDENT CLICK.","WAIT, DID YOU READ EVERYTHING?","YOUR AGREEMENT HAS EXPIRED.","PLEASE TRY AGAIN.","THE CHECKBOX IS HAVING SECOND THOUGHTS."];
+  let termsTimer=null, heckleTimer=null, seconds=10;
+  function clearTermsTimers(){if(termsTimer)clearInterval(termsTimer);if(heckleTimer)clearInterval(heckleTimer);termsTimer=heckleTimer=null;}
+  terms.addEventListener('change',()=>{
+    clearTermsTimers();
+    if(terms.checked){
+      seconds=10;termsMsg.textContent=pick(termsMessages);countdown.textContent=`Your agreement will spontaneously vanish in ${seconds}s.`;
+      heckleTimer=setInterval(()=>{if(terms.checked)termsMsg.textContent=pick(termsMessages);},2200);
+      termsTimer=setInterval(()=>{seconds--;countdown.textContent=`Your agreement will spontaneously vanish in ${seconds}s.`;if(seconds<=0){terms.checked=false;clearTermsTimers();termsMsg.textContent="YOUR AGREEMENT HAS EXPIRED. WHY ARE YOU LIKE THIS?";countdown.textContent="Unchecked. As foretold."; }},1000);
+    } else {termsMsg.textContent=pick(["YOU UNCHECKED IT? DRAMATIC.","OKAY, BUT WHY?","THE BOX IS DISAPPOINTED."]);countdown.textContent='';}
+  });
+
+  // Master pause/restore control.
+  $('stopChaos').addEventListener('click',()=>{
+    const off=document.body.classList.toggle('chaos-off');
+    $('stopChaos').textContent=off?'RESUME THE CHAOS':'STOP THE CHAOS';
+    document.documentElement.style.filter='brightness(1)';
+    slider.value=50;brightMsg.textContent=off?'Chaos paused. You may breathe.':'Chaos resumed. Sorry.';
+    if(off){closeMystery();clearTermsTimers();if(animationId)cancelAnimationFrame(animationId);drawing=false;drawQueue=[];}
+  });
+})();
+</script>
+</body>
+</html>
