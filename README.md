@@ -1,4 +1,5 @@
 # Ragebait
+Prompt
 Attack on Tokens
 Team Ctrl_V
 I want you to create a Webpage.Let this webpage be filled with the ragebaiting features popping all around.The website has to be very vibrant,colourful ,animated and so moving that it is very hard to ignore it. When you create the outline it has to be very cartoonish and crazy to see that it will make person more ragebaited after seeing to its movement.Like add a shinchan's famous buri stem where shinchan is moving at the top and bottom of the website from left to right and right to left in small size The tittle of the website beDARE ME SHOW MY FAULT!!! Features I want you to add are: 
